@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cpp.mapper.JobTagMapper">
+
+    <insert id="insertJobTag">
+        insert into tags(job_id, tag_string)
+        VALUES
+        <foreach collection="jobTags" item="t" separator=",">
+        (#{t.jobId},#{t.tagString})
+        </foreach>
+    </insert>
+</mapper>
