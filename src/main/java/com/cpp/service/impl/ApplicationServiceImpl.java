@@ -44,9 +44,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         int jobSubmit = applyMapper.selectJobSubmit(jobId);
         int total = applyMapper.selectTotal(jobId);
         int i = applyMapper.selectByUserId(userId,jobId);
+        int s = applyMapper.selectJobStatus(jobId);
         LocalDate now = LocalDate.now();
         LocalDate end = jobMapper.selectEndById(jobId);
-        if (jobSubmit < total&& i==0&&(now.isBefore(end) || now.isEqual(end))){
+        if (jobSubmit < total&& i==0&&(now.isBefore(end) || now.isEqual(end))&&s==1){
             return true;
         }else {
             return false;

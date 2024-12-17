@@ -36,8 +36,11 @@ public class TokenInterceptor implements HandlerInterceptor {
 //            String headerValue = request.getHeader(headerName);
 //            log.info("{}: {}", headerName, headerValue);
 //        }
-
-        if (requestURI.contains("/login") || requestURI.contains("/register") || requestURI.contains("/users/*") || requestURI.contains("/information")) {
+        if (requestURI.matches("/chat/\\d+/\\d+")) {
+            log.info("聊天请求，放行");
+            return true;
+        }
+        if (requestURI.contains("/login") || requestURI.contains("/register")) {
             log.info("登录请求，放行");
             return true;
         }

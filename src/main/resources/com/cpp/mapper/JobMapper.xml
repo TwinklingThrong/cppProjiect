@@ -9,7 +9,8 @@
         <where>
         <if test=" jobTitle!= null and jobTitle !='' ">j.job_title like concat('%',#{jobTitle},'%')</if>
         <if test=" jobDesc!= null and jobDesc !='' ">and j.job_desc like concat('%',#{jobDesc},'%')</if>
-        <if test="begin != null and end !=null">and j.end between #{begin} and #{end}</if>
+        <if test="begin != null">and j.end &gt;= #{begin} </if>
+        <if test="end   != null">and j.end &lt;= #{end}</if>
         <if test="salaryMin != null ">and j.job_salary &gt;= #{salaryMin}</if>
         <if test="salaryMax !=null">  and j.job_salary &lt;= #{salaryMax}</if>
         </where>

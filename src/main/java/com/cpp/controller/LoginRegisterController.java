@@ -4,6 +4,9 @@ import com.cpp.pojo.LoginInfo;
 import com.cpp.pojo.Result;
 import com.cpp.pojo.User;
 import com.cpp.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,11 +22,13 @@ public class LoginRegisterController {
     @Autowired
     private UserService userService;
     @PostMapping("/login")
-    public Result login(@RequestBody User user){
+    public Result login(@RequestBody User user,HttpSession session){
         log(user.toString());
         LoginInfo info = userService.login(user);
         if (info != null){
+            session.setAttribute("userId",user.getId());
             return Result.success(info);
+
         }else {
             return Result.error("用户名或密码错误");
         }

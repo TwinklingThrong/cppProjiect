@@ -25,4 +25,6 @@ public interface ApplyMapper {
     List<Apply> listByUserId(Integer userId);
     @Delete("delete from applies where id = #{applyId}")
     void deleteApplyById(Integer applyId);
+    @Select("select job_status from jobs where id =#{jobId}")
+    int selectJobStatus(Integer jobId);
 }

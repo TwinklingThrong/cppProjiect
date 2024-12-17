@@ -89,8 +89,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJob(Integer id) {
+        System.out.println("-------------deleteApply----------------");
         jobMapper.deleteApply(id);
+        System.out.println("-------------deleteJobTag----------------");
         jobMapper.deleteJobTag(id);
+        System.out.println("-------------deleteJob----------------");
         jobMapper.deleteJob(id);
     }
 

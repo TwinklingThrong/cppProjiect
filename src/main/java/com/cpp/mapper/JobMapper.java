@@ -20,7 +20,7 @@ public interface JobMapper {
 
     List<JobTag> taglist(Job job);
 
-    @Select("select j.end from jobs j where id = #{hobId}")
+    @Select("select j.end from jobs j where id = #{jobId}")
     LocalDate selectEndById(Integer jobId);
     @Select("select * from jobs j where id = #{id}")
     Job selectById(Integer id);

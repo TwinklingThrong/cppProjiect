@@ -4,7 +4,9 @@ import com.cpp.pojo.Job;
 import com.cpp.pojo.JobQueryParam;
 import com.cpp.pojo.PageResult;
 import com.cpp.pojo.Result;
+import com.cpp.service.ApplicationService;
 import com.cpp.service.JobService;
+import com.cpp.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,10 @@ public class JobController {
 
     @Autowired
     private JobService jobService;
+    @Autowired
+    private ApplicationService applicationService;
+    @Autowired
+    private MessageService messageService;
 
     // 添加岗位
     @PostMapping
