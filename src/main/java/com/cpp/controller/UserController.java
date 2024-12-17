@@ -19,7 +19,7 @@ public class UserController {
 @Autowired
     private AliyunOSSOperator aliyunOSSOperator;
 
-//---------------------数据回显---------------------------
+//---------------------用户数据回显---------------------------
     @GetMapping("/{id}")
     public Result getById(@PathVariable Integer id){
     User user = userService.getById(id);

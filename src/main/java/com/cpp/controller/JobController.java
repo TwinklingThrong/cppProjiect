@@ -18,15 +18,10 @@ public class JobController {
 
     @Autowired
     private JobService jobService;
-    @Autowired
-    private ApplicationService applicationService;
-    @Autowired
-    private MessageService messageService;
 
     // 添加岗位
     @PostMapping
     public Result insertJob(@RequestBody Job job) {
-        System.out.println("-----------");
         jobService.insertJob(job);
         return Result.success();
     }
@@ -38,17 +33,19 @@ public class JobController {
         return Result.success(pageResult);
     }
 
-    // 查询岗位通过岗位ID
+    // 查询岗位通过岗位ID（数据回显）
     @GetMapping("/{id}")
     public Result getById(@PathVariable Integer id) {
         Job job = jobService.getByJobId(id);
         return Result.success(job);
     }
+    //修改职位信息
     @PutMapping
     public Result updateJob(@RequestBody Job job) {
         jobService.updateJob(job);
         return Result.success();
     }
+    //删除招聘
     @DeleteMapping("/{id}")
     public Result deleteJob(@PathVariable Integer id) {
         jobService.deleteJob(id);

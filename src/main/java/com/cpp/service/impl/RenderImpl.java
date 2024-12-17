@@ -20,7 +20,7 @@ public class RenderImpl {
         }
         return tag;
     }
-    //渲染状态
+    //渲染岗位状态
     public String render(String jobStatus){
         if (jobStatus.equals("0")){
             return "未开始";
@@ -28,6 +28,7 @@ public class RenderImpl {
             return "进行中";
         }
     }
+    //渲染申请状态
     public String render(Integer apppyStatus){
         switch (apppyStatus){
             case 1:
@@ -41,14 +42,15 @@ public class RenderImpl {
         }
         return "提交异常";
     }
-    public String renderG(Integer gender){
-        switch (gender){
-            case 1:
-                return "男";
-            case 2:
-                return "女";
-        }
-        return "未知";
-    }
+    //渲染性别（由于数据类型废弃）改为前端渲染
+//    public String renderG(Integer gender){
+//        switch (gender){
+//            case 1:
+//                return "男";
+//            case 2:
+//                return "女";
+//        }
+//        return "未知";
+//    }
 
 }

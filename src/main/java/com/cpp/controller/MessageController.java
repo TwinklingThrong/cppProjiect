@@ -17,6 +17,7 @@ import java.util.List;
 public class MessageController {
     @Autowired
     private MessageService messageService;
+    //收发信息，读取信息（废弃）
     @GetMapping("/message/{f}/{s}")
     public Result getMessage(@PathVariable String f, @PathVariable String s) {
         log.info("f:{},s:{}", f, s);

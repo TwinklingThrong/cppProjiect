@@ -4,8 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cpp.mapper.JobMapper">
 
-    <select id="list" resultType="com.cpp.pojo.Job">
-        select j.* from jobs j
+    <select id="list" resultMap="jobResultMap">
+        select distinct j.*,t.job_id,group_concat(t.tag_string separator ',') as tag_string from jobs j
+        left join tags t on j.id = t.job_id
         <where>
         <if test=" jobTitle!= null and jobTitle !='' ">j.job_title like concat('%',#{jobTitle},'%')</if>
         <if test=" jobDesc!= null and jobDesc !='' ">and j.job_desc like concat('%',#{jobDesc},'%')</if>
@@ -14,12 +15,55 @@
         <if test="salaryMin != null ">and j.job_salary &gt;= #{salaryMin}</if>
         <if test="salaryMax !=null">  and j.job_salary &lt;= #{salaryMax}</if>
         </where>
-        order by j.end desc
+        group by
+        j.id
+        order by j.job_status and j.end desc
     </select>
+<!--    <select id="list" resultType="com.cpp.pojo.Job">-->
+<!--        select j.* from jobs j-->
+<!--        <where>-->
+<!--            <if test=" jobTitle!= null and jobTitle !='' ">j.job_title like concat('%',#{jobTitle},'%')</if>-->
+<!--            <if test=" jobDesc!= null and jobDesc !='' ">and j.job_desc like concat('%',#{jobDesc},'%')</if>-->
+<!--            <if test="begin != null">and j.end &gt;= #{begin} </if>-->
+<!--            <if test="end   != null">and j.end &lt;= #{end}</if>-->
+<!--            <if test="salaryMin != null ">and j.job_salary &gt;= #{salaryMin}</if>-->
+<!--            <if test="salaryMax !=null">  and j.job_salary &lt;= #{salaryMax}</if>-->
+<!--        </where>-->
+<!--        order by j.end desc-->
+<!--    </select>-->
+
+
     <select id="taglist" resultType="com.cpp.pojo.JobTag">
         select t.* from tags t join jobs j on t.job_id = j.id
         <where>
             <if test="id !=null">j.id=#{id}</if>
         </where>
+    </select>
+
+    <resultMap id="jobResultMap" type="com.cpp.pojo.Job">
+        <id column="id" property="id"/>
+        <result column="job_title" property="jobTitle"/>
+        <result column="job_desc" property="jobDesc"/>
+        <result column="job_salary" property="jobSalary"/>
+        <result column="job_total" property="jobTotal"/>
+        <result column="job_submit" property="jobSubmit"/>
+        <result column="end" property="end"/>
+        <result column="job_status" property="jobStatus"/>
+        <result column="hr_id" property="hrId"/>
+
+        <collection property="jobTags" ofType="com.cpp.pojo.JobTag">
+            <id column="tid" property="id"/>
+            <result column="job_id" property="jobId"/>
+            <result column="tag_string" property="tagString"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectById" resultMap="jobResultMap">
+        select j.*,t.job_id,t.tag_string,t.id tid
+                   from jobs j left join tags t on j.id = t.job_id
+        where j.id = #{id}
+    </select>
+    <select id="listByHrId" resultMap="jobResultMap">
+        select j.* ,t.tag_string from jobs j left join tags t on j.id = t.job_id
     </select>
 </mapper>

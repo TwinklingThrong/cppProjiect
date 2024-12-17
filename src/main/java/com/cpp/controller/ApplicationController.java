@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @RequestMapping("/apply")
 @RestController
@@ -19,6 +21,7 @@ public class ApplicationController {
     private ApplicationService applicationService;
     @Autowired
     private AliyunOSSOperator aliyunOSSOperator;
+    //新增职位申请，内含没有提醒的校验
     @PostMapping
     public Result insertJobApply(@RequestBody Apply apply){
         applicationService.insertJobApply(apply);
@@ -30,10 +33,9 @@ public class ApplicationController {
        String url = aliyunOSSOperator.upload(file.getBytes(),file.getOriginalFilename());
        return Result.success(url);
     }
-    //校验岗位申请是否已满
+    //校验岗位申请是否已满，直接前端提醒拦截
     @GetMapping("/check/{jobId}/{userId}")
     public Result checkJob(@PathVariable Integer jobId ,@PathVariable Integer userId) {
-        // 假设这里需要调用 service 方法进行校验
         if (applicationService.checkJob(jobId,userId)){
         return Result.success();
         } else {
@@ -43,12 +45,13 @@ public class ApplicationController {
     //展示一个职位已投递的申请表
     @GetMapping("/{jobId}")
     public Result getApply(@PathVariable Integer jobId) {
-        return Result.success(applicationService.getApplyByJobId(jobId));
+        List<Apply> applies =applicationService.getApplyByJobId(jobId);
+        return Result.success(applies);
     }
     //改变申请状态
     @PutMapping
     public Result updateApply(@RequestBody Apply apply){
-        log.info("-------------apply:{}",apply);
+        //log.info("-------------apply:{}",apply);
         applicationService.updateApply(apply);
         return Result.success();
     }
@@ -57,6 +60,7 @@ public class ApplicationController {
     public Result getApplyByUserId(@PathVariable Integer userId){
         return Result.success(applicationService.getApplyByUserId(userId));
     }
+    //用户取消申请
     @DeleteMapping("/{applyId}")
     public Result deleteApply(@PathVariable Integer applyId){
         applicationService.deleteApply(applyId);

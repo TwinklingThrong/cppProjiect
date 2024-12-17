@@ -21,6 +21,7 @@ import static com.sun.activation.registries.LogSupport.log;
 public class LoginRegisterController {
     @Autowired
     private UserService userService;
+    //登录
     @PostMapping("/login")
     public Result login(@RequestBody User user,HttpSession session){
         log(user.toString());
@@ -34,6 +35,7 @@ public class LoginRegisterController {
         }
 
     }
+    //注册
     @PostMapping("/register")
     public Result insert(@RequestBody User user) {
         log.info(user.toString());

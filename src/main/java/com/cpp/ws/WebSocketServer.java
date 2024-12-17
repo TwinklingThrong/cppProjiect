@@ -2,10 +2,8 @@ package com.cpp.ws;
 
 import com.cpp.config.WebsocketConfig;
 import com.cpp.pojo.Message;
-import com.cpp.pojo.User;
 import com.cpp.service.MessageService;
 import com.cpp.utils.SpringContextUtil;
-import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
@@ -13,18 +11,17 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 @Component
 @ServerEndpoint(value = "/chat/{user_id_F}/{user_id_S}")
 @Slf4j
 public class WebSocketServer {
+//    @Autowired
+//    private MessageService messageService;
 
     private static final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
@@ -33,7 +30,7 @@ public class WebSocketServer {
         sessions.put(session.getId(), session);
         WebsocketConfig websocketConfig = SpringContextUtil.getBean(WebsocketConfig.class);
         MessageService messageService = SpringContextUtil.getBean(MessageService.class);
-
+        //读取消息
         List<Message> messages = messageService.selectListMessage(userIdF, userIdS);
         for (Message m : messages) {
             log.info("Message: {}", m.getMessage());
@@ -59,6 +56,7 @@ public class WebSocketServer {
             Message m = new Message();
             m.setUserIdF(Integer.parseInt(userIdF));
             m.setUserIdS(Integer.parseInt(userIdS));
+            //声明MessageService
             MessageService messageService = SpringContextUtil.getBean(MessageService.class);
             String i = messageService.SelectUserById(userIdF).getUsername();
             m.setMessage(i+":"+message);
@@ -69,6 +67,7 @@ public class WebSocketServer {
         }
     }
 
+    //广播消息
     public static void broadcast(String message) {
         for (Session session : sessions.values()) {
             try {

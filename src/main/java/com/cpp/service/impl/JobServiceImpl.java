@@ -26,21 +26,26 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private ApplyMapper applyMapper;
 
-    @Override
-    @Transactional
-    public void insertJob(Job job) {
-        jobMapper.insertJob(job);
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    // 添加岗位
+    public void insertJob(Job job) {
+        //插入职位信息
+        jobMapper.insertJob(job);
+        //插入tag信息
         List<JobTag> tagList = job.getJobTags();
+        int id = job.getId();
         if (!CollectionUtils.isEmpty(tagList)) {
             tagList.forEach(tag -> {
-                tag.setJobId(job.getId());
+                tag.setJobId(id);
             });
-            System.out.println(job.getId());
+           // System.out.println(job.getId());
+            //插入tag
             jobTagMapper.insertJobTag(tagList);
         }
     }
-
+    //分页查询
     @Override
     public PageResult<Job> selectPageJob(JobQueryParam jqb) {
         PageHelper.startPage(jqb.getPage(), jqb.getPageSize());
@@ -48,62 +53,64 @@ public class JobServiceImpl implements JobService {
         //jobMapper.updateJob();
         List<Job> jobsList = jobMapper.list(jqb);
         //遍历集合拿对象
-        for (int i = 0; i < jobsList.size(); i++) {
-            Apply apply  = new Apply();
-            apply.setJobId(jobsList.get(i).getId());
-            applyMapper.updateJobSubmit(apply);
-            //把标签拿出来
-            List<JobTag> TagsList = jobMapper.taglist(jobsList.get(i));
-            //标签放入上传的对象里
-            jobsList.get(i).setJobTags(TagsList);
-            //拼接申请人数和招收人数比并放入上传对象
-            jobsList.get(i).setJobSubmitjobTotal(render.render(jobsList.get(i).getJobSubmit(),jobsList.get(i).getJobTotal()));
-            jobsList.get(i).setJobTagsString(render.render(TagsList));
-            jobsList.get(i).setJobStatus(render.render(jobsList.get(i).getJobStatus()));
+        for (Job job : jobsList) {
+//            Apply apply  = new Apply();
+//            apply.setJobId(job.getId());
+            //applyMapper.updateJobSubmit(apply);不知道有什么用，忘记以前怎么想的了，好像是之前有bug用来检查的
+            List<JobTag> jobTags = job.getJobTags();
+            job.setJobSubmitjobTotal(render.render(job.getJobSubmit(),job.getJobTotal()));
+            job.setJobTagsString(job.getJobTags().get(0).getTagString());
+            job.setJobStatus(render.render(job.getJobStatus()));
         }
         Page<Job> p = (Page<Job>) jobsList;
         return new PageResult<Job>(p.getTotal(),p.getResult());
     }
 
+    // 查询岗位通过岗位ID（数据回显）
     @Override
     public Job getByJobId(Integer id) {
         Job job = jobMapper.selectById(id);
-        job.setJobTags(jobMapper.taglist(job));
         return job;
     }
-
+    //修改招聘信息
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateJob(Job job) {
+        //更新job
         jobMapper.updateJob(job);
+        //先删除
         jobMapper.deleteJobTag(job.getId());
+        //后插入
         List<JobTag> tagList = job.getJobTags();
         if (!CollectionUtils.isEmpty(tagList)) {
             tagList.forEach(tag -> {
                 tag.setJobId(job.getId());
             });
-            System.out.println(job.getId());
             jobTagMapper.insertJobTag(tagList);
         }
 
     }
-
+    //删除招聘
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteJob(Integer id) {
-        System.out.println("-------------deleteApply----------------");
+        //删除job所以申请
         jobMapper.deleteApply(id);
-        System.out.println("-------------deleteJobTag----------------");
+        //删除job所有标签
         jobMapper.deleteJobTag(id);
-        System.out.println("-------------deleteJob----------------");
+        //删除job
         jobMapper.deleteJob(id);
     }
 
+    //Hr查看招聘
     @Override
     public List<Job> getByHrId(Integer hrId) {
         List<Job> jobsList = jobMapper.listByHrId(hrId);
-        for (int i = 0; i < jobsList.size(); i++){
-            jobsList.get(i).setJobSubmitjobTotal(render.render(jobsList.get(i).getJobSubmit(),jobsList.get(i).getJobTotal()));
-            jobsList.get(i).setJobStatus(render.render(jobsList.get(i).getJobStatus()));
-            jobsList.get(i).setJobTagsString(render.render(jobMapper.taglist(jobsList.get(i))));
+        for (Job job :jobsList){
+            //渲染数据
+            job.setJobSubmitjobTotal(render.render(job.getJobSubmit(),job.getJobTotal()));
+            job.setJobStatus(render.render(job.getJobStatus()));
+            job.setJobTagsString(render.render(jobMapper.taglist(job)));
         }
         return jobsList;
     }

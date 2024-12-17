@@ -19,13 +19,13 @@ public class MessageServiceImpl implements MessageService {
     MessageMapper messageMapper;
     @Autowired
     UserMapper userMapper;
-    @Autowired
-    JobMapper jobMapper;
+
+    //发送信息
     @Override
     public void insertMessage(Message m) {
         messageMapper.insertMessage(m);
     }
-
+    //读取信息
     @Override
     public List<Message> selectListMessage(String f, String s) {
         List<Message> list = messageMapper.selectListMessage(f,s);
@@ -36,7 +36,7 @@ public class MessageServiceImpl implements MessageService {
         return list;
 
     }
-
+    //获取用户名
     @Override
     public User SelectUserById(String userIdF) {
         return userMapper.getById(Integer.parseInt(userIdF));

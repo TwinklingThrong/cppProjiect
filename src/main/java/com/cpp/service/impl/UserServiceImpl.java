@@ -19,6 +19,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    //注册
     @Override
     @Transactional
     public void insert(User user) {
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
         user.setUpdateTime(LocalDateTime.now());
         userMapper.insert(user);
     }
-
+    //登录
     @Override
     public LoginInfo login(User user) {
         User u = userMapper.loginByUserNamePassword(user);
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    //通过id找用户
     @Override
     public User getById(Integer id) {
         return userMapper.getById(id);
@@ -46,6 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    //修改个人信息
     @Override
     public void update(User user) {
         userMapper.updataById(user);

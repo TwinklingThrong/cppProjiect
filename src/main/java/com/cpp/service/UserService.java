@@ -10,7 +10,7 @@ public interface UserService {
     LoginInfo login(User user);
 
     void update(User user);
-
+    //通过id找用户
     User getById(Integer id);
 
 }
