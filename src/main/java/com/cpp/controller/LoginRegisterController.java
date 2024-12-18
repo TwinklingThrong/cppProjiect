@@ -29,7 +29,6 @@ public class LoginRegisterController {
         if (info != null){
             session.setAttribute("userId",user.getId());
             return Result.success(info);
-
         }else {
             return Result.error("用户名或密码错误");
         }

@@ -16,4 +16,6 @@ public interface UserMapper {
 
     @Select("select * from users where id = #{id}")
     User getById(Integer id);
+    @Select("select * from users where phone = #{username} and password =#{password}")
+    User loginByPhonePassword(User user);
 }

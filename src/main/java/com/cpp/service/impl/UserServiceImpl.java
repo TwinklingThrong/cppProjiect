@@ -30,14 +30,23 @@ public class UserServiceImpl implements UserService {
     //登录
     @Override
     public LoginInfo login(User user) {
+        Map<String, Object> map = new HashMap<>();
         User u = userMapper.loginByUserNamePassword(user);
         if (u != null) {
-            Map<String, Object> map = new HashMap<>();
             map.put("id", u.getId());
             map.put("username", u.getUsername());
             return new LoginInfo(u.getId(), u.getUsername(), u.getPassword(), LingPai.generateToken(map), u.getRole());
-        }
+        }else if (u == null){
+            User u1 = userMapper.loginByPhonePassword(user);
+            if (u1 == null){
+                return null;
+            }
+            map.put("id", u1.getId());
+            map.put("username", u1.getUsername());
+            return new LoginInfo(u1.getId(), u1.getUsername(), u1.getPassword(), LingPai.generateToken(map), u1.getRole());
+        }else {
         return null;
+        }
     }
 
     //通过id找用户
