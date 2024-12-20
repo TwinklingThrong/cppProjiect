@@ -60,10 +60,10 @@
 
     <select id="selectById" resultMap="jobResultMap">
         select j.*,t.job_id,t.tag_string,t.id tid
-                   from jobs j left join tags t on j.id = t.job_id
+        from jobs j left join tags t on j.id = t.job_id
         where j.id = #{id}
     </select>
     <select id="listByHrId" resultMap="jobResultMap">
-        select j.* ,t.tag_string from jobs j left join tags t on j.id = t.job_id
+        select j.* ,t.tag_string from jobs j left join tags t on j.id = t.job_id where j.hr_id =#{hrId}
     </select>
 </mapper>

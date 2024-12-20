@@ -20,5 +20,5 @@ public interface ApplicationService {
     //通过用户id找所有他申请过的工作
     List<Apply> getApplyByUserId(Integer userId);
 
-    void deleteApply(Integer applyId);
+    void deleteApply(Integer applyId, Integer jobId);
 }

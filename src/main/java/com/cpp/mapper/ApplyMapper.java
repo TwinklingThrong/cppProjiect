@@ -12,7 +12,7 @@ public interface ApplyMapper {
     void insertJobApply(Apply apply);
     //刷新总的申请数
     @Update("update jobs j set j.job_submit = (select count(*) from applies a where a.job_id = #{jobId} ) where j.id = #{jobId}  ")
-    void updateJobSubmit(Apply apply);
+    void updateJobSubmit(Integer jobId);
 
     //检查申请数
     @Select("select count(*) from applies a where a.job_id = #{jobId}")
@@ -45,4 +45,6 @@ public interface ApplyMapper {
     //判断岗位状态
     @Select("select job_status from jobs where id =#{jobId}")
     int selectJobStatus(Integer jobId);
+    @Select("select t.job_id from tags t where id = #{applyId}")
+    Integer selectJobByApplyId(Integer applyId);
 }

@@ -61,9 +61,9 @@ public class ApplicationController {
         return Result.success(applicationService.getApplyByUserId(userId));
     }
     //用户取消申请
-    @DeleteMapping("/{applyId}")
-    public Result deleteApply(@PathVariable Integer applyId){
-        applicationService.deleteApply(applyId);
+    @DeleteMapping("/{applyId}/{jobId}")
+    public Result deleteApply(@PathVariable Integer applyId,@PathVariable Integer jobId){
+        applicationService.deleteApply(applyId,jobId);
         return Result.success();
     }
 

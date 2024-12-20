@@ -29,10 +29,10 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<Message> selectListMessage(String f, String s) {
         List<Message> list = messageMapper.selectListMessage(f,s);
-        for (Message m : list) {
-            m.setUserIdFString(userMapper.getById(m.getUserIdF()).getUsername());
-            m.setUserIdSString(userMapper.getById(m.getUserIdS()).getUsername());
-        }
+//        for (Message m : list) {
+//            m.setUserIdFString(userMapper.getById(m.getUserIdF()).getUsername());
+//            m.setUserIdSString(userMapper.getById(m.getUserIdS()).getUsername());
+//        }
         return list;
 
     }

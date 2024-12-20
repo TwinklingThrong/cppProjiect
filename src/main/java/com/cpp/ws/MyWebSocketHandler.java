@@ -6,6 +6,7 @@ import com.cpp.service.MessageService;
 import com.cpp.utils.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -18,77 +19,92 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class MyWebSocketHandler extends TextWebSocketHandler {
     MessageService messageService = SpringContextUtil.getBean(MessageService.class);
-    String f;
-    String s;
-    User fi;
-    User si;
-
     private static final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
     //private final UriTemplateHandler uriTemplateHandler = new DefaultUriTemplateHandler();
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        //拿到id，找到对应的对象
         String uri = session.getUri().toString();
-        sessions.put(session.getId(), session);
-        System.out.println(uri);
         int last = uri.lastIndexOf('/');
-        int lastSecond = uri.lastIndexOf('/',last-1);
-        f = uri.substring(lastSecond+1,last);
-        s = uri.substring(last+1);
-        fi = messageService.SelectUserById(f);
-        si = messageService.SelectUserById(s);
-        System.out.println(f+""+s);
-        messageService.SelectUserById(String.valueOf(f));
-        List<Message> messages = messageService.selectListMessage(f, s);
+        int lastSecond = uri.lastIndexOf('/', last - 1);
+        String f = uri.substring(lastSecond + 1, last);
+        String s = uri.substring(last + 1);
+        User fi = messageService.SelectUserById(f);
+        User si = messageService.SelectUserById(s);
+        //存起来
+        String sessionId = f+":"+s+":"+session.getId();
+        sessions.put(sessionId,session);
+        //找到消息，然后合成
+        List<Message> messages = messageService.selectListMessage(f,s);
         for (Message m : messages) {
             log.info("Message: {}", m.getMessage());
             try {
                 String ms;
-                if (Integer.parseInt(f) == m.getUserIdF() ){
-                    ms = fi.getUsername() +":"+m.getMessage();
-                }else {
-                    ms = si.getUsername() +":"+m.getMessage();
+                if (Integer.parseInt(f) == m.getUserIdF()) {
+                    ms = fi.getUsername() + ":" + m.getMessage();
+                } else {
+                    ms = si.getUsername() + ":" + m.getMessage();
                 }
                 session.sendMessage(new TextMessage(ms));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        log.info("用户 {} 连接建立", f);
-
     }
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        // 处理接收到的消息
-        try {
-            log.info("收到消息: {}", message);
-            Message m = new Message();
-            m.setUserIdF(Integer.parseInt(f));
-            m.setUserIdS(Integer.parseInt(s));
-            //声明MessageService
-            //MessageService messageService = SpringContextUtil.getBean(MessageService.class);
-            String ms;
-            if (Integer.parseInt(f) == m.getUserIdF() ){
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        String uri = session.getUri().toString();
+        int last = uri.lastIndexOf('/');
+        int lastSecond = uri.lastIndexOf('/', last - 1);
+        String f = uri.substring(lastSecond + 1, last);
+        String s = uri.substring(last + 1);
+        User fi = messageService.SelectUserById(f);
+        User si = messageService.SelectUserById(s);
+        //存起来
+        Message mg = new Message();
+        mg.setMessage(message.getPayload());
+        mg.setUserIdF(Integer.parseInt(f));
+        mg.setUserIdS(Integer.parseInt(s));
+        messageService.insertMessage(mg);
+        String ms;
+
+            if (Integer.parseInt(f)==fi.getId()){
                 ms = fi.getUsername() +":"+message.getPayload();
             }else {
                 ms = si.getUsername() +":"+message.getPayload();
             }
-            m.setMessage(message.getPayload());
-            messageService.insertMessage(m);
-            //session.sendMessage(new TextMessage(ms));
-            broadcast(new TextMessage(ms));
-        } catch (Exception e) {
-            log.error("发送消息失败", e);
+            sendToUsers(f,s,new TextMessage(ms));
         }
+
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        // 移除关闭的会话
+        sessions.values().removeIf(wsSession -> wsSession.getId().equals(session.getId()));
+        log.info("用户会话关闭");
     }
-    public static void broadcast(TextMessage message) {
+    private void sendToUsers(String user1, String user2, TextMessage message) {
         for (WebSocketSession session : sessions.values()) {
             try {
+                String uri = session.getUri().toString();
+                int last = uri.lastIndexOf('/');
+                int lastSecond = uri.lastIndexOf('/', last - 1);
+                String f = uri.substring(lastSecond + 1, last);
+                String s = uri.substring(last + 1);
 
-                session.sendMessage(message);
+                // 检查是否是目标用户之一
+                if ((f.equals(user1) && s.equals(user2)) || (f.equals(user2) && s.equals(user1))) {
+                    if (session.isOpen()) {
+                        session.sendMessage(message);
+                    } else {
+                        log.warn("会话已关闭，跳过发送消息: {}", session.getId());
+                    }
+                }
             } catch (IOException e) {
                 log.error("广播消息失败", e);
             }
         }
-    }
-}
+    }}
+
+

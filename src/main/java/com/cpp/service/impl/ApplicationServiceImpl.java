@@ -5,7 +5,6 @@ import com.cpp.mapper.JobMapper;
 import com.cpp.pojo.*;
 import com.cpp.service.ApplicationService;
 import com.cpp.service.UserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +27,18 @@ public class ApplicationServiceImpl implements ApplicationService {
         //检查申请数
         int jobSubmit = applyMapper.selectJobSubmit(apply.getJobId());
         int total = applyMapper.selectTotal(apply.getJobId());
+        System.out.println(jobSubmit+"======"+total);
         //判断
         if (jobSubmit < total) {
             //插入申请
             applyMapper.insertJobApply(apply);
             //重新计算total
-            applyMapper.updateJobSubmit(apply);
+            applyMapper.updateJobSubmit(apply.getJobId());
         }else {
             //再次计算total可以省略
-            applyMapper.updateJobSubmit(apply);
+            //applyMapper.updateJobSubmit(apply);
             throw new RuntimeException("该岗位已满员");
+
         }
     }
     //检查是否可以申请这个职位
@@ -103,7 +104,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
     //取消申请
     @Override
-    public void deleteApply(Integer applyId) {
+    public void deleteApply(Integer applyId, Integer jobId) {
         applyMapper.deleteApplyById(applyId);
+        applyMapper.updateJobSubmit(jobId);
     }
 }
