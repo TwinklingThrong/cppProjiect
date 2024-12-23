@@ -19,6 +19,6 @@ private Integer hrId;
 private List<JobTag> jobTags;//岗位标签，感觉要分表
 ////////////////////////下面是用来渲染的数据
 //private String jobStatus
-private String jobSubmitjobTotal;
-private String jobTagsString;
+private String jobSubmitjobTotal;//给前端用的
+private String jobTagsString;//给前端用的
 }

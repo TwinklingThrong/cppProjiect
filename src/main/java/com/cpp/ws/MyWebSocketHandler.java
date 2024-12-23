@@ -1,5 +1,4 @@
 package com.cpp.ws;
-
 import com.cpp.pojo.Message;
 import com.cpp.pojo.User;
 import com.cpp.service.MessageService;
@@ -10,7 +9,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -20,16 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MyWebSocketHandler extends TextWebSocketHandler {
     MessageService messageService = SpringContextUtil.getBean(MessageService.class);
     private static final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-
-    //private final UriTemplateHandler uriTemplateHandler = new DefaultUriTemplateHandler();
+    UriHandle urlHandle = new UriHandle();
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         //拿到id，找到对应的对象
         String uri = session.getUri().toString();
-        int last = uri.lastIndexOf('/');
-        int lastSecond = uri.lastIndexOf('/', last - 1);
-        String f = uri.substring(lastSecond + 1, last);
-        String s = uri.substring(last + 1);
+        urlHandle.chuLi(uri);
+        String f = urlHandle.getFid();
+        String s = urlHandle.getSid();
         User fi = messageService.SelectUserById(f);
         User si = messageService.SelectUserById(s);
         //存起来
@@ -55,12 +51,13 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String uri = session.getUri().toString();
-        int last = uri.lastIndexOf('/');
-        int lastSecond = uri.lastIndexOf('/', last - 1);
-        String f = uri.substring(lastSecond + 1, last);
-        String s = uri.substring(last + 1);
+        urlHandle.chuLi(uri);
+        String f = urlHandle.getFid();
+        String s = urlHandle.getSid();
+
         User fi = messageService.SelectUserById(f);
         User si = messageService.SelectUserById(s);
+
         //存起来
         Message mg = new Message();
         mg.setMessage(message.getPayload());
@@ -86,13 +83,12 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     }
     private void sendToUsers(String user1, String user2, TextMessage message) {
         for (WebSocketSession session : sessions.values()) {
+            //sessions.values()获得Map的值的集合
             try {
                 String uri = session.getUri().toString();
-                int last = uri.lastIndexOf('/');
-                int lastSecond = uri.lastIndexOf('/', last - 1);
-                String f = uri.substring(lastSecond + 1, last);
-                String s = uri.substring(last + 1);
-
+                  urlHandle.chuLi(uri);
+                  String f = urlHandle.getFid();
+                  String s = urlHandle.getSid();
                 // 检查是否是目标用户之一
                 if ((f.equals(user1) && s.equals(user2)) || (f.equals(user2) && s.equals(user1))) {
                     if (session.isOpen()) {

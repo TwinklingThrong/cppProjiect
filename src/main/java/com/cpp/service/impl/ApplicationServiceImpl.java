@@ -14,8 +14,6 @@ import java.util.List;
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
     @Autowired
-    private RenderImpl render;
-    @Autowired
     private UserService userMapper;
     @Autowired
     private ApplyMapper applyMapper;
@@ -72,7 +70,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             //往申请返回里插入用户信息
             apply.setUser(userMapper.getById(apply.getUserId()));
             //往申请里渲染申请状态信息
-            apply.setApplyStatusRender(render.render(apply.getApplyStatus()));
+            //apply.setApplyStatusRender(render.render(apply.getApplyStatus()));
         }
         return applyList;
     }
@@ -91,8 +89,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         for (Apply apply : applyList) {
             Job job = jobMapper.selectById(apply.getJobId());
             List<JobTag> jobTags = job.getJobTags();
-            job.setJobTagsString(render.render(jobTags));
-            apply.setApplyStatusRender(render.render(apply.getApplyStatus()));
+
+//            job.setJobTagsString(render.render(jobTags));
+//            apply.setApplyStatusRender(render.render(apply.getApplyStatus()));
+
             apply.setJob(job);
 
 //            applyList.get(i).setJob(jobMapper.selectById(applyList.get(i).getJobId()));

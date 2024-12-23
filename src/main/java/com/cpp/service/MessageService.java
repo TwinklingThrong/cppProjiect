@@ -11,4 +11,6 @@ public interface MessageService {
     List<Message> selectListMessage(String f, String s);
 
     User SelectUserById(String userIdF);
+
+    List<User> selectChatUserListByMyUserId(Integer f);
 }

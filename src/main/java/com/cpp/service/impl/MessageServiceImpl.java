@@ -29,10 +29,6 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<Message> selectListMessage(String f, String s) {
         List<Message> list = messageMapper.selectListMessage(f,s);
-//        for (Message m : list) {
-//            m.setUserIdFString(userMapper.getById(m.getUserIdF()).getUsername());
-//            m.setUserIdSString(userMapper.getById(m.getUserIdS()).getUsername());
-//        }
         return list;
 
     }
@@ -40,5 +36,11 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public User SelectUserById(String userIdF) {
         return userMapper.getById(Integer.parseInt(userIdF));
+    }
+    //获取聊天列表
+    @Override
+    public List<User> selectChatUserListByMyUserId(Integer f) {
+        List<User> users = messageMapper.selectChatUserListByMyUserId(f);
+        return users;
     }
 }

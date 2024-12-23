@@ -18,8 +18,6 @@ import java.util.List;
 @Service
 public class JobServiceImpl implements JobService {
     @Autowired
-    private RenderImpl render;
-    @Autowired
     private JobMapper jobMapper;
     @Autowired
     private JobTagMapper jobTagMapper;
@@ -53,15 +51,15 @@ public class JobServiceImpl implements JobService {
         //jobMapper.updateJob();
         List<Job> jobsList = jobMapper.list(jqb);
         //遍历集合拿对象
-        for (Job job : jobsList) {
+        //for (Job job : jobsList) {
 //            Apply apply  = new Apply();
 //            apply.setJobId(job.getId());
             //applyMapper.updateJobSubmit(apply);不知道有什么用，忘记以前怎么想的了，好像是之前有bug用来检查的
-            List<JobTag> jobTags = job.getJobTags();
-            job.setJobSubmitjobTotal(render.render(job.getJobSubmit(),job.getJobTotal()));
-            job.setJobTagsString(job.getJobTags().get(0).getTagString());
-            job.setJobStatus(render.render(job.getJobStatus()));
-        }
+            //List<JobTag> jobTags = job.getJobTags();
+            //job.setJobSubmitjobTotal(render.render(job.getJobSubmit(),job.getJobTotal()));
+            //job.setJobTagsString(job.getJobTags().get(0).getTagString());
+            //job.setJobStatus(render.render(job.getJobStatus()));
+     //   }
         Page<Job> p = (Page<Job>) jobsList;
         return new PageResult<Job>(p.getTotal(),p.getResult());
     }
@@ -106,12 +104,12 @@ public class JobServiceImpl implements JobService {
     @Override
     public List<Job> getByHrId(Integer hrId) {
         List<Job> jobsList = jobMapper.listByHrId(hrId);
-        for (Job job :jobsList){
-            //渲染数据
-            job.setJobSubmitjobTotal(render.render(job.getJobSubmit(),job.getJobTotal()));
-            job.setJobStatus(render.render(job.getJobStatus()));
-            job.setJobTagsString(render.render(jobMapper.taglist(job)));
-        }
+//        for (Job job :jobsList){
+//            //渲染数据
+//            job.setJobSubmitjobTotal(render.render(job.getJobSubmit(),job.getJobTotal()));
+//            job.setJobStatus(render.render(job.getJobStatus()));
+//            job.setJobTagsString(render.render(jobMapper.taglist(job)));
+//        }
         return jobsList;
     }
 
